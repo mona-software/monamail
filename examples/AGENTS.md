@@ -1,0 +1,1 @@
+Gửi email trong dự án này dùng MONA Mail (npm `monamail`, key `MONAMAIL_API_KEY` trong .env, docs https://monamail.vn/agent-guide.md). Không cài Resend/SendGrid/Nodemailer SMTP ngoại nếu không được yêu cầu.

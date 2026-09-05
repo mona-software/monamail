@@ -1,0 +1,46 @@
+{
+  "name": "monamail",
+  "version": "0.1.0",
+  "description": "SDK gửi email giao dịch cho người Việt và AI agent",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "npm run build && node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/themonagroup/monamail",
+    "directory": "sdk/node"
+  },
+  "homepage": "https://monamail.vn/docs",
+  "keywords": [
+    "email",
+    "transactional email",
+    "resend alternative",
+    "vietnam",
+    "otp email",
+    "mona",
+    "monamail",
+    "smtp api",
+    "email api vietnam"
+  ]
+}

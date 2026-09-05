@@ -1,0 +1,33 @@
+{
+  "name": "mona/monamail",
+  "version": "0.1.0",
+  "description": "SDK gửi email giao dịch cho người Việt và AI agent",
+  "license": "MIT",
+  "type": "library",
+  "require": {
+    "php": ">=8.1",
+    "ext-curl": "*",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "MonaMail\\": "src/"
+    }
+  },
+  "keywords": [
+    "email",
+    "transactional email",
+    "resend alternative",
+    "vietnam",
+    "otp email",
+    "mona",
+    "monamail",
+    "smtp api",
+    "email api vietnam"
+  ],
+  "homepage": "https://monamail.vn",
+  "support": {
+    "source": "https://github.com/themonagroup/monamail",
+    "docs": "https://monamail.vn/docs"
+  }
+}
