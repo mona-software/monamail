@@ -1,26 +1,52 @@
-# Framework examples
+# MONA Mail framework examples
 
-| Ví dụ | Đặt vào dự án |
+Copy-ready examples that send an OTP or handle webhooks with the MONA Mail SDKs.
+
+| Example | File to add to your project |
 |---|---|
 | Next.js App Router | `nextjs-app-router/app/api/otp/route.ts` |
-| Express gửi và xác minh OTP | `express/otp.mjs` |
-| Django | `django/views.py`, gắn view `send_otp` vào URL của app |
-| Laravel | `laravel/app/Mail/MonaMailOtp.php` và `laravel/routes/api.php` |
+| Express: send and verify OTP | `express/otp.mjs` |
+| Django | `django/views.py` (route the `send_otp` view in your app) |
+| Laravel | `laravel/app/Mail/MonaMailOtp.php` and `laravel/routes/api.php` |
 | WordPress | `wordpress/mu-plugins/monamail-wp-mail.php` |
 | Express webhook | `webhook-express.mjs` |
-| cURL | [8 lệnh](curl.md) |
+| cURL | [curl.md](curl.md) |
 
-Cài SDK từ thư mục tương ứng hoặc package registry khi đã publish. Framework dependency thuộc app sử dụng ví dụ.
-Export `MONAMAIL_API_KEY`, `MONAMAIL_FROM`, `MONAMAIL_OWNER_EMAIL`; webhook cần `MONAMAIL_WEBHOOK_SECRET`.
-Express OTP cần thêm `OTP_HASH_SECRET` là bí mật ngẫu nhiên riêng. Next.js cần secret store/session verify riêng khi ghép vào app.
-Laravel thêm `services.monamail.key = env('MONAMAIL_API_KEY')`, `services.monamail.from = env('MONAMAIL_FROM', 'onboarding@monamail.vn')` trong `config/services.php` để chạy được với config cache.
+## Install
 
-POST JSON `{"email":"owner@example.com"}` vào `/otp` hoặc `/api/otp` theo framework. Bắt đầu với key `mm_test_`.
-`onboarding@monamail.vn` chỉ tới email chủ tài khoản. Dùng sender thuộc domain verified khi gửi cho khách.
-Các ví dụ không trả OTP hay key trong response. Rate limit demo là 1 OTP/60 giây/địa chỉ; Express có endpoint verify, 5 lượt nhập và hết hạn 5 phút.
-Next.js, Django và Laravel là ví dụ gửi; nối store OTP vào endpoint xác minh của app, xoá khi dùng xong và giới hạn số lượt nhập.
-Production dùng Redis/DB cho TTL, rate limit nguyên tử theo tài khoản/IP và chống bot; map trong process không chia sẻ giữa worker và mất khi restart.
-Webhook demo chống trùng trong 48 giờ; production dùng event_id UNIQUE cùng transaction nghiệp vụ, chỉ trả 2xx sau khi ghi bền vững.
-WordPress giữ kết quả filter trước, nhận text/HTML, cc/bcc/reply-to và file đính kèm. API nhận queued nghĩa là đã tiếp nhận, chưa có nghĩa delivered.
+Install the SDK for your runtime (`npm install monamail`, `pip install monamail` or `composer require mona/monamail`). Framework dependencies belong to the app that uses the example.
 
-Không dùng email thật trong test tự động. Không commit `.env`; chỉ copy [AGENTS.md](AGENTS.md) vào repository cần tích hợp.
+## Configuration
+
+| Variable | Used by |
+|---|---|
+| `MONAMAIL_API_KEY` | All examples |
+| `MONAMAIL_FROM` | Sender address |
+| `MONAMAIL_OWNER_EMAIL` | Recipient for tests with `onboarding@monamail.vn` |
+| `MONAMAIL_WEBHOOK_SECRET` | Webhook example |
+| `OTP_HASH_SECRET` | Express OTP example (a separate random secret) |
+
+For Laravel, add these to `config/services.php` so the example works with config caching:
+
+```php
+'monamail' => [
+    'key' => env('MONAMAIL_API_KEY'),
+    'from' => env('MONAMAIL_FROM', 'onboarding@monamail.vn'),
+],
+```
+
+## Usage
+
+POST `{"email":"owner@example.com"}` to `/otp` or `/api/otp`, depending on the framework. Start with an `mm_test_` key.
+
+- `onboarding@monamail.vn` only delivers to the account owner. Use a sender on a verified domain for customers.
+- The examples never return the OTP or the key in a response. The demo rate limit is one OTP per address per 60 seconds; the Express example also has a verify endpoint with five attempts and a five-minute expiry.
+- Next.js, Django and Laravel only send. Connect your own OTP store and verify endpoint, delete codes after use and limit attempts.
+- In production, use Redis or a database for TTLs, atomic rate limits per account or IP, and bot protection. In-process maps are not shared between workers and are lost on restart.
+- The webhook demo deduplicates for 48 hours. In production, store `event_id` with a UNIQUE constraint in the same transaction as your business logic and return 2xx only after the write is durable.
+- The WordPress plugin keeps earlier filter results and supports text/HTML, cc/bcc, reply-to and attachments.
+- An API response of `queued` means the email was accepted, not yet delivered.
+
+Do not use real addresses in automated tests and do not commit `.env`. Copy [AGENTS.md](AGENTS.md) into a repository to give coding agents the integration rules.
+
+**MONA Mail is part of MONA Cloud by The MONA Group.**

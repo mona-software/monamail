@@ -1,86 +1,97 @@
-```sh
+# monamail
+
+Node.js SDK for the MONA Mail transactional email API.
+
+Runs on Node.js 18+ using the global `fetch`, with no runtime dependencies. Ships ESM, CommonJS and TypeScript types.
+
+## Install
+
+```bash
 npm install monamail
-# MONAMAIL_API_KEY trong .env; dùng key mm_test_ để gửi thử miễn phí
-node --input-type=module -e 'import {MonaMail} from "monamail"; await new MonaMail(process.env.MONAMAIL_API_KEY).emails.send({from:"onboarding@monamail.vn",to:process.env.MONAMAIL_OWNER_EMAIL,subject:"Thử mail",text:"Xin chào"})'
 ```
 
-# MONA Mail node 0.1.1
-
-MONA Mail là dịch vụ gửi email giao dịch cho phần mềm và AI agent của người Việt: một API, trả VND qua ví MONA Cloud và nạp bằng VietQR, thuộc nhóm MONA Cloud của The MONA Group.
+## Quick start
 
 ```ts
 import { MonaMail, MonaMailError } from 'monamail';
+
 const client = new MonaMail(process.env.MONAMAIL_API_KEY, { timeoutMs: 15000 });
-const sent = await client.emails.send({ from: 'Shop <noreply@shop.vn>', to: 'a@example.com', subject: 'OTP', text: '123456' }, { idempotencyKey: 'otp-request-123' });
+
+const sent = await client.emails.send(
+  { from: 'Shop <noreply@shop.vn>', to: 'a@example.com', subject: 'OTP', text: '123456' },
+  { idempotencyKey: 'otp-request-123' },
+);
 await client.emails.get(sent.id);
 await client.domains.create({ domain: 'shop.vn' });
-// JWT MONA Pass cần cho tạo, xoay, thu hồi API key và đổi gói.
-const valid = MonaMail.verifyWebhook({ secret: process.env.MONAMAIL_WEBHOOK_SECRET!, timestamp, body: rawBody, signature, now: Date.now() / 1000 });
 ```
 
-Node ≥18; global fetch; không dependency runtime. CommonJS: `const { MonaMail } = require('monamail')`.
-Tuỳ chọn constructor: `baseUrl`, `timeoutMs`, `fetch` để mock. `now` dùng Unix giây; bỏ `now` chỉ kiểm chữ ký.
+CommonJS: `const { MonaMail } = require('monamail')`.
 
-## Bề mặt SDK
+## Usage
 
-| Nhóm | Hàm |
+| Resource | Methods |
 |---|---|
-| emails | send, get, list, cancel, batch, events |
-| domains | create, get, list, verify, remove, cloudflare |
-| apiKeys | list, create, rotate, revoke |
-| webhooks | create, list, test, rotate, remove, deliveries |
-| suppressions | list, add, remove |
-| templates | create, get, list, update, remove, render |
-| account | get, setPlan |
-| plans | list |
-| stats | get |
+| `emails` | `send`, `get`, `list`, `cancel`, `batch`, `events` |
+| `domains` | `create`, `get`, `list`, `verify`, `remove`, `cloudflare` |
+| `apiKeys` | `list`, `create`, `rotate`, `revoke` |
+| `webhooks` | `create`, `list`, `test`, `rotate`, `remove`, `deliveries` |
+| `suppressions` | `list`, `add`, `remove` |
+| `templates` | `create`, `get`, `list`, `update`, `remove`, `render` |
+| `account` | `get`, `setPlan` |
+| `plans` | `list` |
+| `stats` | `get` |
 
-Body và response theo [contract API](https://monamail.vn/docs). `request` mở cho endpoint bổ sung.
-Tạo/xoay/thu hồi API key và đổi gói cần JWT MONA Pass; API key cho app chỉ gọi các route cho phép key.
-Key live `mm_live_` gửi thật; key test `mm_test_` đi pipeline và kết thúc `sandbox`, không tính quota hay trừ ví.
-`onboarding@monamail.vn` chỉ gửi tới email chủ tài khoản. Địa chỉ khác cần domain verified.
+`client.request(method, path, body?, query?, options?)` is available for endpoints not covered above. Request and response bodies follow the [API reference](https://monamail.vn/docs).
 
-## Lỗi, retry và webhook
+### Keys and senders
 
-`MonaMailError` giữ `status`, `code`, `message`, `next_step`, `request_id` và payload gốc trong `details`.
-402: dừng để nạp tiền hoặc duyệt gói. 403: kiểm domain, người nhận và quyền theo `next_step`.
-429/5xx: retry tối đa 1 lần, giữ nguyên body và `Idempotency-Key`. Tôn trọng `Retry-After`; timeout áp cho từng request mạng.
-Mọi POST tự tạo key nếu chưa truyền. Dùng key ổn định theo tác vụ để tránh gửi trùng giữa các lần gọi SDK; TTL API là 24 giờ.
-Không tự retry lỗi mạng vì chưa biết server đã nhận tới đâu. App thử lại với key cũ.
-Webhook dùng HMAC SHA-256 của `timestamp.raw_body`; so sánh hằng thời gian, truyền thời gian hiện tại để chặn lệch hơn 300 giây.
-Giữ nguyên bytes body trước JSON parse và xử lý idempotent theo event `id`.
+- `mm_live_` keys deliver mail. `mm_test_` keys run the pipeline and finish with status `sandbox`, without delivering, using quota or charging the wallet.
+- Creating, rotating or revoking API keys and changing plans require a MONA Pass JWT; app API keys can only call the routes allowed for keys.
+- `onboarding@monamail.vn` can only send to the account owner's address. Other recipients need a verified domain.
 
-## Đổi từ Resend
+### Errors and retries
 
-```diff
-- import { Resend } from 'resend';
-+ import { MonaMail } from 'monamail';
-+ const resend = new MonaMail(process.env.MONAMAIL_API_KEY);
+`MonaMailError` exposes `status`, `code`, `message`, `next_step`, `request_id` and the raw payload in `details`.
+
+- `402`: top up the wallet or approve a plan.
+- `403`: check the domain, recipient or permissions as described in `next_step`.
+- `429`/`5xx`: the SDK retries once with the same body and `Idempotency-Key`, honoring `Retry-After`.
+
+Every POST gets an `Idempotency-Key` (generated if you do not pass one). Pass a stable key per task when your app retries; the API keeps keys for 24 hours. Network errors are not retried automatically; retry from your app with the same key.
+
+### Webhooks
+
+```ts
+const valid = MonaMail.verifyWebhook({
+  secret: process.env.MONAMAIL_WEBHOOK_SECRET!,
+  timestamp,          // X-Mona-Timestamp header
+  body: rawBody,      // exact raw request body
+  signature,          // X-Mona-Signature header, "sha256=<hex>"
+  now: Date.now() / 1000,
+});
 ```
 
-Thay constructor Resend cũ bằng dòng 3, giữ body gửi tương thích. Đây là bản Node; Python/PHP dùng constructor phía trên.
-MONA Mail trả email trực tiếp và ném exception; sửa chỗ đọc `{data,error}` của Resend.
-React Email và Broadcasts cần chuyển thành HTML hoặc giữ luồng cũ; không coi là tương thích tự động.
+The signature is HMAC-SHA256 of `timestamp.raw_body`, compared in constant time. Passing `now` (Unix seconds) rejects timestamps more than 300 seconds off; omit it to check only the signature. Keep the raw body bytes before JSON parsing and deduplicate events by `id`.
 
-## Cho AI agent
+## Configuration
 
-```text
-Đọc https://monamail.vn/agent-guide.md rồi dùng MONA Mail cho dự án.
-Đăng nhập MONA Pass qua monacloud-mcp, đọc mail_account và chạy sandbox.
-Tạo domain, xác minh DNS, tạo key rồi lưu MONAMAIL_API_KEY vào .env; không in key ra chat.
-Gửi thử, kiểm mail_status, webhook bounced và suppression; báo lại kết quả thật.
+| Option | Default | Purpose |
+|---|---|---|
+| `baseUrl` | `https://api.monamail.vn` | API host (a trailing `/v1` is accepted) |
+| `timeoutMs` | `15000` | Per-request timeout |
+| `fetch` | `globalThis.fetch` | Custom fetch, e.g. for tests |
+
+Framework examples: [../examples](../examples/README.md). Website: [monamail.vn](https://monamail.vn).
+
+## Development
+
+```bash
+npm install
+npm test
 ```
 
-[Hợp đồng thao tác cho AI](https://monamail.vn/agent-guide.md). Ví dụ framework ở [../examples](../examples).
+## License
 
-## English
+MIT
 
-MONA Mail is a transactional email API for Vietnamese developers and AI agents, billed in VND through VietQR. It belongs to MONA Cloud, The MONA Group.
-Install with the command at the top, export `MONAMAIL_API_KEY` and `MONAMAIL_OWNER_EMAIL`, and send your first message. The CLI examples read exported environment variables; load your `.env` through your framework or shell.
-Use a verified sender domain, or send from `onboarding@monamail.vn` to the account owner's email only. Test keys never deliver to the Internet and do not consume quota or wallet balance.
-All POST requests carry an idempotency key and retry once on 429/5xx with the same key and body. Provide a stable application key when retrying across SDK calls. Handle typed errors with their HTTP status, API code, next step and request ID.
-Verify webhook signatures using the exact raw request body, pass the current Unix time to enforce the 300-second window, and deduplicate by event ID.
-The migration diff above replaces the import and constructor; adapt Resend's response/error wrapper to direct return values and exceptions. React Email/Broadcasts are separate migration work.
-For AI agents, read [agent-guide.md](https://monamail.vn/agent-guide.md), use MONA Pass with MCP, test in sandbox, then configure domain, key and bounce handling. Never expose keys in chat or source control.
-
-MIT · [Source](https://github.com/mona-software/monamail) · [API docs](https://monamail.vn/docs)
+**MONA Mail is part of MONA Cloud by The MONA Group.**

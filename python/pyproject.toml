@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }
 authors = [{ name = "MONA Software", email = "info@themona.global" }]
-keywords = ["email", "transactional email", "resend alternative", "vietnam", "otp email", "mona", "monamail", "smtp api", "email api vietnam"]
+keywords = ["email", "transactional email", "vietnam", "otp email", "monamail", "smtp api", "email api"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "License :: OSI Approved :: MIT License",

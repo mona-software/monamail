@@ -35,13 +35,11 @@
   "keywords": [
     "email",
     "transactional email",
-    "resend alternative",
     "vietnam",
     "otp email",
-    "mona",
     "monamail",
     "smtp api",
-    "email api vietnam"
+    "email api"
   ],
   "devDependencies": {
     "@types/node": "^26.4.0",
