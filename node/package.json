@@ -1,6 +1,6 @@
 {
   "name": "monamail",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "SDK gửi email giao dịch cho người Việt và AI agent",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -28,8 +28,8 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/themonagroup/monamail",
-    "directory": "sdk/node"
+    "url": "https://github.com/mona-software/monamail",
+    "directory": "node"
   },
   "homepage": "https://monamail.vn/docs",
   "keywords": [
@@ -42,5 +42,10 @@
     "monamail",
     "smtp api",
     "email api vietnam"
-  ]
+  ],
+  "devDependencies": {
+    "@types/node": "^26.4.0",
+    "typescript": "^7.0.2"
+  },
+  "author": "MONA Software"
 }

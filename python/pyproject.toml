@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "monamail"
-version = "0.1.0"
+version = "0.1.1"
 description = "SDK gửi email giao dịch cho người Việt và AI agent"
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }
-authors = [{ name = "The MONA Group", email = "info@themona.global" }]
+authors = [{ name = "MONA Software", email = "info@themona.global" }]
 keywords = ["email", "transactional email", "resend alternative", "vietnam", "otp email", "mona", "monamail", "smtp api", "email api vietnam"]
 classifiers = [
   "Development Status :: 3 - Alpha",
@@ -21,8 +21,9 @@ classifiers = [
 ]
 
 [project.urls]
+Homepage = "https://monamail.vn"
 Documentation = "https://monamail.vn/docs"
-Repository = "https://github.com/themonagroup/monamail"
+Repository = "https://github.com/mona-software/monamail"
 
 [tool.setuptools.packages.find]
 include = ["monamail*"]

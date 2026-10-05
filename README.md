@@ -1,6 +1,6 @@
 # MONA Mail SDK 0.1.0 — email API for Vietnamese apps and AI agents (Resend alternative, pay in VND)
 
-MONA Mail là dịch vụ gửi email giao dịch cho phần mềm và AI agent của người Việt: một API, trả VND, không cần thẻ, thuộc nhóm MONA Cloud của The MONA Group.
+MONA Mail là dịch vụ gửi email giao dịch cho phần mềm và AI agent của người Việt: một API, trả VND qua ví MONA Cloud và nạp bằng VietQR, thuộc nhóm MONA Cloud của The MONA Group.
 
 | Runtime | Package | Source |
 |---|---|---|
@@ -21,3 +21,5 @@ cd ../php && php tests/smoke.php
 
 Node build tìm tsc cục bộ rồi fallback compiler đã có trong MONA Cloud MCP. Không tải dependency lúc build.
 Agent đọc [agent-guide.md](https://monamail.vn/agent-guide.md); ứng dụng dùng biến `MONAMAIL_API_KEY` trong môi trường server.
+
+**MONA Mail thuộc bộ MONA Cloud của The MONA Group.**

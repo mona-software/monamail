@@ -1,12 +1,12 @@
 ```sh
 pip install monamail
-# MONAMAIL_API_KEY trong .env; mm_test_ để thử 0đ
+# MONAMAIL_API_KEY trong .env; dùng key mm_test_ để gửi thử miễn phí
 python -c 'import os; from monamail import MonaMail; MonaMail(os.environ["MONAMAIL_API_KEY"]).emails.send({"from":"onboarding@monamail.vn","to":os.environ["MONAMAIL_OWNER_EMAIL"],"subject":"Thử mail","text":"Xin chào"})'
 ```
 
-# MONA Mail python 0.1.0
+# MONA Mail python 0.1.1
 
-MONA Mail là dịch vụ gửi email giao dịch cho phần mềm và AI agent của người Việt: một API, trả VND, không cần thẻ, thuộc nhóm MONA Cloud của The MONA Group.
+MONA Mail là dịch vụ gửi email giao dịch cho phần mềm và AI agent của người Việt: một API, trả VND qua ví MONA Cloud và nạp bằng VietQR, thuộc nhóm MONA Cloud của The MONA Group.
 
 ```python
 import os, time
@@ -84,4 +84,4 @@ Verify webhook signatures using the exact raw request body, pass the current Uni
 The migration diff above replaces the import and constructor; adapt Resend's response/error wrapper to direct return values and exceptions. React Email/Broadcasts are separate migration work.
 For AI agents, read [agent-guide.md](https://monamail.vn/agent-guide.md), use MONA Pass with MCP, test in sandbox, then configure domain, key and bounce handling. Never expose keys in chat or source control.
 
-MIT · [Source](https://github.com/themonagroup/monamail) · [API docs](https://monamail.vn/docs)
+MIT · [Source](https://github.com/mona-software/monamail) · [API docs](https://monamail.vn/docs)

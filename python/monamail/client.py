@@ -1,4 +1,4 @@
-"""MONA Mail 0.1.0. HTTP transport uses only the Python standard library."""
+"""MONA Mail 0.1.1. HTTP transport uses only the Python standard library."""
 import json
 import math
 import time
@@ -190,7 +190,7 @@ class MonaMail:
         url = self.base_url + '/v1' + path
         if query:
             url += '?' + parse.urlencode({k: v for k, v in query.items() if v is not None})
-        headers = {'Authorization': 'Bearer ' + self.api_key, 'Accept': 'application/json', 'User-Agent': 'monamail-python/0.1.0'}
+        headers = {'Authorization': 'Bearer ' + self.api_key, 'Accept': 'application/json', 'User-Agent': 'monamail-python/0.1.1'}
         data = json.dumps(body, ensure_ascii=False).encode('utf-8') if body is not None else None
         if data is not None:
             headers['Content-Type'] = 'application/json'

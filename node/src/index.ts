@@ -53,7 +53,7 @@ export class MonaMail {
   async request<T = Data>(method: string, path: string, body?: unknown, query?: Query, options: RequestOptions = {}): Promise<T> {
     const url = new URL(`${this.baseUrl}/v1${path}`);
     for (const [key, value] of Object.entries(query ?? {})) if (value !== undefined) url.searchParams.set(key, String(value));
-    const headers: Record<string, string> = { Authorization: `Bearer ${this.key}`, Accept: 'application/json', 'User-Agent': 'monamail-node/0.1.0' };
+    const headers: Record<string, string> = { Authorization: `Bearer ${this.key}`, Accept: 'application/json', 'User-Agent': 'monamail-node/0.1.1' };
     const serialized = body === undefined ? undefined : JSON.stringify(body);
     if (serialized !== undefined) headers['Content-Type'] = 'application/json';
     if (method === 'POST') headers['Idempotency-Key'] = options.idempotencyKey ?? (body as SendEmail | undefined)?.idempotency_key ?? randomUUID();
